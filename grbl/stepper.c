@@ -101,7 +101,7 @@ typedef struct {
   #endif
   #ifdef ENABLE_RGB_LED
     uint8_t update_rgb;
-    uint8_t rgb[0];
+    uint8_t rgb[3];
   #endif
 } segment_t;
 static segment_t segment_buffer[SEGMENT_BUFFER_SIZE];
@@ -734,6 +734,9 @@ void st_prep_buffer()
           if (pl_block->update_rgb == 1) {
             // printPgmString(PSTR("get RGB from pl_block\n")); // JAVL            
             prep.update_rgb = pl_block->update_rgb;
+            // prep.rgb[0] = pl_block->rgb[0];
+            // prep.rgb[1] = pl_block->rgb[1];
+            // prep.rgb[2] = pl_block->rgb[2];
             memcpy(prep.rgb, pl_block->rgb, 3*sizeof(uint8_t));
             // printPgmString(PSTR("st_prep_block ")); // JAVL
             // print_uint8_base10(st_prep_block->rgb[0]); 
@@ -901,6 +904,9 @@ void st_prep_buffer()
         prep.update_rgb = 0;        
         prep_segment->update_rgb = 1;
         memcpy(prep_segment->rgb, prep.rgb, 3*sizeof(uint8_t));
+        // prep_segment->rgb[0] = prep.rgb[0];
+        // prep_segment->rgb[1] = prep.rgb[1];
+        // prep_segment->rgb[2] = prep.rgb[2];
       }
     #endif
 
