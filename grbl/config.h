@@ -168,6 +168,10 @@
 // NOTE: The M8 flood coolant control pin on analog pin 3 will still be functional regardless.
 // #define ENABLE_M7 // Disabled by default. Uncomment to enable.
 
+// Enable a WS28xx led using command `M150 <r> <g> <b>`
+// For example: `M150 200 100 100` for a light red color
+#define ENABLE_RGB_LED
+
 // This option causes the feed hold input to act as a safety door switch. A safety door, when triggered,
 // immediately forces a feed hold and then safely de-energizes the machine. Resuming is blocked until
 // the safety door is re-engaged. When it is, Grbl will re-energize the machine and then resume on the

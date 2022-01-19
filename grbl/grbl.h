@@ -60,6 +60,7 @@
 #include "spindle_control.h"
 #include "stepper.h"
 #include "jog.h"
+#include "rgb_led.h"
 
 // ---------------------------------------------------------------------------------------
 // COMPILE-TIME ERROR CHECKING OF DEFINE VALUES:

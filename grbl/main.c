@@ -91,6 +91,9 @@ int main(void)
     coolant_init();
     limits_init();
     probe_init();
+    #ifdef ENABLE_RGB_LED
+      rgb_led_init();
+    #endif
     plan_reset(); // Clear block buffer and planner variables
     st_reset(); // Clear stepper subsystem variables.
 

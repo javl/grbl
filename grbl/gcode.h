@@ -45,6 +45,7 @@
 #define MODAL_GROUP_M7 12 // [M3,M4,M5] Spindle turning
 #define MODAL_GROUP_M8 13 // [M7,M8,M9] Coolant control
 #define MODAL_GROUP_M9 14 // [M56] Override control
+#define MODAL_GROUP_M10 15 // [M150] Set RGB led
 
 // Define command actions for within execution-type modal groups (motion, stopping, non-modal). Used
 // internally by the parser to know which command to execute.
@@ -94,6 +95,9 @@
 #define PROGRAM_FLOW_OPTIONAL_STOP 1 // M1 NOTE: Not supported, but valid and ignored.
 #define PROGRAM_FLOW_COMPLETED_M2  2 // M2 (Do not alter value)
 #define PROGRAM_FLOW_COMPLETED_M30 30 // M30 (Do not alter value)
+
+// Modal Group M10: RGB led
+#define SET_RGB_LED 0 // (Default: Must be zero)
 
 // Modal Group G5: Feed rate mode
 #define FEED_RATE_MODE_UNITS_PER_MIN  0 // G94 (Default: Must be zero)
@@ -194,6 +198,7 @@ typedef struct {
   uint8_t coolant;         // {M7,M8,M9}
   uint8_t spindle;         // {M3,M4,M5}
   uint8_t override;        // {M56}
+  uint8_t set_rgb_led;     // {M150}
 } gc_modal_t;
 
 typedef struct {
@@ -206,7 +211,7 @@ typedef struct {
   float r;         // Arc radius
   float s;         // Spindle speed
   uint8_t t;       // Tool selection
-  float xyz[3];    // X,Y,Z Translational axes
+  float xyz[3];    // X,Y,Z Translational axes / R, G, B for RGB LED
 } gc_values_t;
 
 

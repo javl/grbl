@@ -280,6 +280,12 @@ uint8_t gc_execute_line(char *line)
               gc_block.modal.override = OVERRIDE_PARKING_MOTION;
               break;
           #endif
+          #ifdef ENABLE_RGB_LED
+            case 150:
+              word_bit = MODAL_GROUP_M10;
+              gc_block.modal.set_rgb_led = SET_RGB_LED;
+              break;
+          #endif
           default: FAIL(STATUS_GCODE_UNSUPPORTED_COMMAND); // [Unsupported M command]
         }
 
@@ -956,6 +962,17 @@ uint8_t gc_execute_line(char *line)
     gc_state.modal.coolant = gc_block.modal.coolant;
   }
   pl_data->condition |= gc_state.modal.coolant; // Set condition flag for planner use.
+
+  #ifdef ENABLED_RGB_LED
+  // [8.b RGB led control ]:
+  gc_state.modal.set_rgb_led = gc_block.modal.set_rgb_led;
+  if (gc_state.modal.set_rgb_led) {
+    uint8_t r = gc_block.values.xyz[0];
+    uint8_t g = gc_block.values.xyz[1];
+    uint8_t b = gc_block.values.xyz[2];
+    rgb_led_set(0, r, g, b);
+  }
+  #endif
 
   // [9. Override control ]: NOT SUPPORTED. Always enabled. Except for a Grbl-only parking control.
   #ifdef ENABLE_PARKING_OVERRIDE_CONTROL

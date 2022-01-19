@@ -96,6 +96,13 @@
   #define PROBE_BIT       5  // Uno Analog Pin 5
   #define PROBE_MASK      (1<<PROBE_BIT)
 
+  // Define RGB led
+  #if defined(ENABLE_RGB_LED)
+    #define RGB_LED_DDR    DDRB
+    #define RGB_LED_PORT   PORTB
+    #define RGB_LED_BIT    PORTB5  // 5 = Uno Digital Pin 13 (NOTE: D13 can't be pulled-high input due to LED.)
+  #endif
+
   #if !defined(ENABLE_DUAL_AXIS)
 
     // Define flood and mist coolant enable output pins.
