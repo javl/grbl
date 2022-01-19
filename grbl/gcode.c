@@ -913,7 +913,6 @@ uint8_t gc_execute_line(char *line)
       }
     }
   }
-  printPgmString(PSTR("B"));
   // [0. Non-specific/common error-checks and miscellaneous setup]:
   // NOTE: If no line number is present, the value is zero.
   gc_state.line_number = gc_block.values.n;
@@ -955,7 +954,6 @@ uint8_t gc_execute_line(char *line)
   gc_state.tool = gc_block.values.t;
 
   // [6. Change tool ]: NOT SUPPORTED
-  printPgmString(PSTR("C"));
   // [7. Spindle control ]:
   if (gc_state.modal.spindle != gc_block.modal.spindle) {
     // Update spindle control and apply spindle speed when enabling it in this block.
@@ -975,17 +973,11 @@ uint8_t gc_execute_line(char *line)
   }
   pl_data->condition |= gc_state.modal.coolant; // Set condition flag for planner use.
 
-  printPgmString(PSTR("D"));
   #ifdef ENABLE_RGB_LED
-  printPgmString(PSTR("E"));
   // [8.b RGB led control ]:
-  printPgmString(PSTR("led is enabled, check for state"));
   gc_state.modal.set_rgb_led = gc_block.modal.set_rgb_led;
   if (gc_state.modal.set_rgb_led) {
-    printPgmString(PSTR("get the values"));    
     rgb_led_set(0, gc_block.values.rgb[0], gc_block.values.rgb[1], gc_block.values.rgb[2]);
-  } else {
-    printPgmString(PSTR("state is wrong?"));
   }
   #endif
 
