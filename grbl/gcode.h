@@ -97,7 +97,7 @@
 #define PROGRAM_FLOW_COMPLETED_M30 30 // M30 (Do not alter value)
 
 // Modal Group M10: RGB led
-#define SET_RGB_LED 0 // (Default: Must be zero)
+#define SET_RGB_LED 1 // (Default: Must be zero)
 
 // Modal Group G5: Feed rate mode
 #define FEED_RATE_MODE_UNITS_PER_MIN  0 // G94 (Default: Must be zero)
@@ -150,9 +150,12 @@
 #define WORD_R  7
 #define WORD_S  8
 #define WORD_T  9
-#define WORD_X  10
-#define WORD_Y  11
-#define WORD_Z  12
+#define WORD_U  10
+#define WORD_V  11
+#define WORD_W  12
+#define WORD_X  14
+#define WORD_Y  15
+#define WORD_Z  16
 
 // Define g-code parser position updating flags
 #define GC_UPDATE_POS_TARGET   0 // Must be zero
@@ -204,6 +207,7 @@ typedef struct {
 typedef struct {
   float f;         // Feed
   float ijk[3];    // I,J,K Axis arc offsets
+  uint8_t rgb[3];  // RGB values for LED
   uint8_t l;       // G10 or canned cycles parameters
   int32_t n;       // Line number
   float p;         // G10 or dwell parameters

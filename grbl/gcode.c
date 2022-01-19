@@ -32,6 +32,9 @@
 #define AXIS_COMMAND_MOTION_MODE 2
 #define AXIS_COMMAND_TOOL_LENGTH_OFFSET 3 // *Undefined but required
 
+#define RGB_COMMAND_NONE 0
+#define RGB_COMMAND_SET 1
+
 // Declare gc extern struct
 parser_state_t gc_state;
 parser_block_t gc_block;
@@ -79,9 +82,11 @@ uint8_t gc_execute_line(char *line)
   uint8_t axis_0, axis_1, axis_linear;
   uint8_t coord_select = 0; // Tracks G10 P coordinate selection for execution
 
+  uint8_t rgb_command = RGB_COMMAND_NONE;
   // Initialize bitflag tracking variables for axis indices compatible operations.
   uint8_t axis_words = 0; // XYZ tracking
   uint8_t ijk_words = 0; // IJK tracking
+  uint8_t rgb_words = 0; // RGB tracking
 
   // Initialize command and value words and parser flags variables.
   uint16_t command_words = 0; // Tracks G and M command words. Also used for modal group violations.
@@ -284,6 +289,7 @@ uint8_t gc_execute_line(char *line)
             case 150:
               word_bit = MODAL_GROUP_M10;
               gc_block.modal.set_rgb_led = SET_RGB_LED;
+              rgb_command = RGB_COMMAND_SET;
               break;
           #endif
           default: FAIL(STATUS_GCODE_UNSUPPORTED_COMMAND); // [Unsupported M command]
@@ -322,6 +328,11 @@ uint8_t gc_execute_line(char *line)
 					  if (value > MAX_TOOL_NUMBER) { FAIL(STATUS_GCODE_MAX_VALUE_EXCEEDED); }
             gc_block.values.t = int_value;
 						break;
+
+          case 'U': word_bit = WORD_U; gc_block.values.rgb[0] = int_value; rgb_words |= (1<<(0)); break; // red
+          case 'V': word_bit = WORD_V; gc_block.values.rgb[1] = int_value; rgb_words |= (1<<(1)); break; // green
+          case 'W': word_bit = WORD_W; gc_block.values.rgb[2] = int_value; rgb_words |= (1<<(2)); break; // blue
+
           case 'X': word_bit = WORD_X; gc_block.values.xyz[X_AXIS] = value; axis_words |= (1<<X_AXIS); break;
           case 'Y': word_bit = WORD_Y; gc_block.values.xyz[Y_AXIS] = value; axis_words |= (1<<Y_AXIS); break;
           case 'Z': word_bit = WORD_Z; gc_block.values.xyz[Z_AXIS] = value; axis_words |= (1<<Z_AXIS); break;
@@ -839,6 +850,7 @@ uint8_t gc_execute_line(char *line)
     bit_false(value_words,(bit(WORD_N)|bit(WORD_F)|bit(WORD_S)|bit(WORD_T))); // Remove single-meaning value words.
   }
   if (axis_command) { bit_false(value_words,(bit(WORD_X)|bit(WORD_Y)|bit(WORD_Z))); } // Remove axis words.
+  if (rgb_command) { bit_false(value_words,(bit(WORD_U)|bit(WORD_V)|bit(WORD_W))); } // Remove rgb words.
   if (value_words) { FAIL(STATUS_GCODE_UNUSED_WORDS); } // [Unused words]
 
   /* -------------------------------------------------------------------------------------
@@ -901,7 +913,7 @@ uint8_t gc_execute_line(char *line)
       }
     }
   }
-
+  printPgmString(PSTR("B"));
   // [0. Non-specific/common error-checks and miscellaneous setup]:
   // NOTE: If no line number is present, the value is zero.
   gc_state.line_number = gc_block.values.n;
@@ -943,7 +955,7 @@ uint8_t gc_execute_line(char *line)
   gc_state.tool = gc_block.values.t;
 
   // [6. Change tool ]: NOT SUPPORTED
-
+  printPgmString(PSTR("C"));
   // [7. Spindle control ]:
   if (gc_state.modal.spindle != gc_block.modal.spindle) {
     // Update spindle control and apply spindle speed when enabling it in this block.
@@ -963,14 +975,17 @@ uint8_t gc_execute_line(char *line)
   }
   pl_data->condition |= gc_state.modal.coolant; // Set condition flag for planner use.
 
-  #ifdef ENABLED_RGB_LED
+  printPgmString(PSTR("D"));
+  #ifdef ENABLE_RGB_LED
+  printPgmString(PSTR("E"));
   // [8.b RGB led control ]:
+  printPgmString(PSTR("led is enabled, check for state"));
   gc_state.modal.set_rgb_led = gc_block.modal.set_rgb_led;
   if (gc_state.modal.set_rgb_led) {
-    uint8_t r = gc_block.values.xyz[0];
-    uint8_t g = gc_block.values.xyz[1];
-    uint8_t b = gc_block.values.xyz[2];
-    rgb_led_set(0, r, g, b);
+    printPgmString(PSTR("get the values"));    
+    rgb_led_set(0, gc_block.values.rgb[0], gc_block.values.rgb[1], gc_block.values.rgb[2]);
+  } else {
+    printPgmString(PSTR("state is wrong?"));
   }
   #endif
 

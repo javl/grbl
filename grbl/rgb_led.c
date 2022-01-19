@@ -13,19 +13,22 @@ https://www.instructables.com/Bitbanging-step-by-step-Arduino-control-of-WS2811-
 uint8_t* rgb_led_rgb_arr = NULL;
 uint32_t rgb_led_t_f;
 
-void rgb_led_init(void) {
+void rgb_led_init(void) 
+{
 
   RGB_LED_DDR |= (1 << RGB_LED_BIT); // Configure as output pin
   RGB_LED_PORT &= ~(1<<RGB_LED_BIT); // Set pin to low
   // RGB_LED_PORT |= (1<<RGB_LED_BIT);  // Set pin to high
 
-  if((rgb_led_rgb_arr = (uint8_t *)malloc(RGB_LED_NUM_BYTES))) {
+  if((rgb_led_rgb_arr = (uint8_t *)malloc(RGB_LED_NUM_BYTES))) 
+  {
     memset(rgb_led_rgb_arr, 0, RGB_LED_NUM_BYTES);
   }
   rgb_led_render();
 }
 
-void rgb_led_set(uint16_t idx, uint8_t r, uint8_t g, uint8_t b) {
+void rgb_led_set(uint16_t idx, uint8_t r, uint8_t g, uint8_t b) 
+{
   if(idx < RGB_LED_NUM_RGB) {
     uint8_t *p = &rgb_led_rgb_arr[idx*3];
     *p++ = g;
@@ -35,14 +38,16 @@ void rgb_led_set(uint16_t idx, uint8_t r, uint8_t g, uint8_t b) {
   rgb_led_render();
 }
 
-unsigned long rgb_led_micros() {
-	unsigned long m;
-	uint8_t oldSREG = SREG, t;
-	cli();
-	return ((m << 8) + t) * (64 / ( F_CPU / 1000000L ));
-}
+// unsigned long rgb_led_micros() 
+// {
+// 	unsigned long m;
+// 	uint8_t oldSREG = SREG, t;
+// 	cli();
+// 	return ((m << 8) + t) * (64 / ( F_CPU / 1000000L ));
+// }
 
-void rgb_led_render(void) {
+void rgb_led_render(void) 
+{
   if(!rgb_led_rgb_arr) { return; }
 
   // while((rgb_led_micros() - rgb_led_t_f) < 50L);  // wait for 50us (data latch)
