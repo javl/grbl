@@ -1,8 +1,8 @@
 ### NOTE on this fork: 
 
-This is a direct fork of the original Grbl, with one addition: it allows you to control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken it uses the `XYZ` arguments for the `RGB` colors, e.g. `M150 X200 Y100 Z100` will set the color to a light red. Color values are in the range `0-255`.
+This is a direct fork of the original Grbl, with one addition: it allows you to control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken it uses the `UWV` arguments for the `RGB` colors, e.g. `M150 U200 W100 V100` will set the color to a light red. Color values are in the range `0-255`.
 
-The LED can be turned off again by setting all colors to zero: `M150 X0 Y0 Z0`. There is also a `ENABLE_RGB_FLAG` in `configuration.h` that should disable this function completely (but in that case you might be better of just using  vanilla Grbl).
+The LED can be turned off again by setting all colors to zero: `M150 U0 W0 V0`. There is also a `ENABLE_RGB_FLAG` in `config.h` that should disable this function completely (but in that case you might be better of just using  vanilla Grbl).
 
 **Warning!** This function was added to be used on a specific machine I built and **has not been tested** on a 'regular' CNC machine. The pin used for the LED is one that possibly overlaps the pin for `Spindle Enable` (depending on your settings), which I didn't need. Please be careful when trying to use this code on your machine as it might behave in unexpected ways!
 
