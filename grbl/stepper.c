@@ -383,6 +383,7 @@ ISR(TIMER1_COMPA_vect)
         if (st.exec_segment->update_rgb == RGB_COMMAND_SET) {
           st.exec_segment->update_rgb = 0;
           rgb_led_set(0, st.exec_segment->rgb[0], st.exec_segment->rgb[1], st.exec_segment->rgb[2]);
+        }
       #endif
       // If the new segment starts a new planner block, initialize stepper variables and counters.
       // NOTE: When the segment data index changes, this indicates a new planner block.
