@@ -78,6 +78,10 @@ typedef struct {
   float max_junction_speed_sqr; // Junction entry speed limit based on direction vectors in (mm/min)^2
   float rapid_rate;             // Axis-limit adjusted maximum rate for this block direction in (mm/min)
   float programmed_rate;        // Programmed rate of this block (mm/min).
+  #ifdef ENABLE_RGB_LED
+    uint8_t update_rgb;
+    uint8_t rgb[3];         // Desired RGB color through line motion
+  #endif
 
   #ifdef VARIABLE_SPINDLE
     // Stored spindle speed data used by spindle overrides and resuming methods.
@@ -90,6 +94,10 @@ typedef struct {
 typedef struct {
   float feed_rate;          // Desired feed rate for line motion. Value is ignored, if rapid motion.
   float spindle_speed;      // Desired spindle speed through line motion.
+  #ifdef ENABLE_RGB_LED
+    uint8_t update_rgb;        // Boolean to tell if we want to update the RGB LED's color
+    uint8_t rgb[3];         // Desired RGB color through line motion
+  #endif
   uint8_t condition;        // Bitflag variable to indicate planner conditions. See defines above.
   #ifdef USE_LINE_NUMBERS
     int32_t line_number;    // Desired line number to report when executing.

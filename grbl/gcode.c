@@ -288,7 +288,6 @@ uint8_t gc_execute_line(char *line)
           #ifdef ENABLE_RGB_LED
             case 150:
               word_bit = MODAL_GROUP_M10;
-              gc_block.modal.set_rgb_led = SET_RGB_LED;
               rgb_command = RGB_COMMAND_SET;
               break;
           #endif
@@ -949,7 +948,14 @@ uint8_t gc_execute_line(char *line)
   if (bit_isfalse(gc_parser_flags,GC_PARSER_LASER_DISABLE)) {
     pl_data->spindle_speed = gc_state.spindle_speed; // Record data for planner use. 
   } // else { pl_data->spindle_speed = 0.0; } // Initialized as zero already.
-  
+
+  #ifdef ENABLE_RGB_LED
+  if (rgb_command == RGB_COMMAND_SET) {
+    gc_state.modal.update_rgb = RGB_COMMAND_SET;
+    memcpy(gc_state.modal.rgb, gc_block.values.rgb, 3*sizeof(uint8_t));
+  }
+  #endif
+
   // [5. Select tool ]: NOT SUPPORTED. Only tracks tool value.
   gc_state.tool = gc_block.values.t;
 
@@ -972,14 +978,6 @@ uint8_t gc_execute_line(char *line)
     gc_state.modal.coolant = gc_block.modal.coolant;
   }
   pl_data->condition |= gc_state.modal.coolant; // Set condition flag for planner use.
-
-  #ifdef ENABLE_RGB_LED
-  // [8.b RGB led control ]:
-  gc_state.modal.set_rgb_led = gc_block.modal.set_rgb_led;
-  if (gc_state.modal.set_rgb_led) {
-    rgb_led_set(0, gc_block.values.rgb[0], gc_block.values.rgb[1], gc_block.values.rgb[2]);
-  }
-  #endif
 
   // [9. Override control ]: NOT SUPPORTED. Always enabled. Except for a Grbl-only parking control.
   #ifdef ENABLE_PARKING_OVERRIDE_CONTROL
@@ -1072,6 +1070,13 @@ uint8_t gc_execute_line(char *line)
   gc_state.modal.motion = gc_block.modal.motion;
   if (gc_state.modal.motion != MOTION_MODE_NONE) {
     if (axis_command == AXIS_COMMAND_MOTION_MODE) {
+      #ifdef ENABLE_RGB_LED
+        if (gc_state.modal.update_rgb == RGB_COMMAND_SET) {
+          gc_state.modal.update_rgb = RGB_COMMAND_NONE; // clear our rgb flag
+          pl_data->update_rgb = RGB_COMMAND_SET;
+          memcpy(pl_data->rgb, gc_state.modal.rgb, 3*sizeof(uint8_t));
+        }
+      #endif
       uint8_t gc_update_pos = GC_UPDATE_POS_TARGET;
       if (gc_state.modal.motion == MOTION_MODE_LINEAR) {
         mc_line(gc_block.values.xyz, pl_data);

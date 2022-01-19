@@ -324,6 +324,12 @@ uint8_t plan_buffer_line(float *target, plan_line_data_t *pl_data)
   #ifdef USE_LINE_NUMBERS
     block->line_number = pl_data->line_number;
   #endif
+  #ifdef ENABLE_RGB_LED
+    if (pl_data->update_rgb == SET_RGB_LED) {
+      block->update_rgb = SET_RGB_LED;
+      memcpy(block->rgb, pl_data->rgb, 3*sizeof(uint8_t));
+    }
+  #endif
 
   // Compute and store initial move distance data.
   int32_t target_steps[N_AXIS], position_steps[N_AXIS];

@@ -35,6 +35,9 @@
 #define PREP_FLAG_PARKING bit(2)
 #define PREP_FLAG_DECEL_OVERRIDE bit(3)
 
+#define RGB_COMMAND_NONE 1
+#define RGB_COMMAND_SET 1
+
 // Define Adaptive Multi-Axis Step-Smoothing(AMASS) levels and cutoff frequencies. The highest level
 // frequency bin starts at 0Hz and ends at its cutoff frequency. The next lower level frequency bin
 // starts at the next higher cutoff frequency, and so on. The cutoff frequencies for each level must
@@ -73,6 +76,10 @@ typedef struct {
   #ifdef VARIABLE_SPINDLE
     uint8_t is_pwm_rate_adjusted; // Tracks motions that require constant laser power/rate
   #endif
+  #ifdef ENABLE_RGB_LED
+    uint8_t update_rgb;
+    uint8_t rgb[3];
+  #endif
 } st_block_t;
 static st_block_t st_block_buffer[SEGMENT_BUFFER_SIZE-1];
 
@@ -91,6 +98,10 @@ typedef struct {
   #endif
   #ifdef VARIABLE_SPINDLE
     uint8_t spindle_pwm;
+  #endif
+  #ifdef ENABLE_RGB_LED
+    uint8_t update_rgb;
+    uint8_t rgb[0];
   #endif
 } segment_t;
 static segment_t segment_buffer[SEGMENT_BUFFER_SIZE];
@@ -171,6 +182,11 @@ typedef struct {
   float exit_speed;       // Exit speed of executing block (mm/min)
   float accelerate_until; // Acceleration ramp end measured from end of block (mm)
   float decelerate_after; // Deceleration ramp start measured from end of block (mm)
+
+  #ifdef ENABLE_RGB_LED
+  uint8_t update_rgb;
+  uint8_t rgb[3];
+  #endif
 
   #ifdef VARIABLE_SPINDLE
     float inv_rate;    // Used by PWM laser mode to speed up segment calculations.
@@ -363,12 +379,16 @@ ISR(TIMER1_COMPA_vect)
       // Initialize step segment timing per step and load number of steps to execute.
       OCR1A = st.exec_segment->cycles_per_tick;
       st.step_count = st.exec_segment->n_step; // NOTE: Can sometimes be zero when moving slow.
+      #ifdef ENABLE_RGB_LED
+        if (st.exec_segment->update_rgb == RGB_COMMAND_SET) {
+          st.exec_segment->update_rgb = 0;
+          rgb_led_set(0, st.exec_segment->rgb[0], st.exec_segment->rgb[1], st.exec_segment->rgb[2]);
+      #endif
       // If the new segment starts a new planner block, initialize stepper variables and counters.
       // NOTE: When the segment data index changes, this indicates a new planner block.
       if ( st.exec_block_index != st.exec_segment->st_block_index ) {
         st.exec_block_index = st.exec_segment->st_block_index;
         st.exec_block = &st_block_buffer[st.exec_block_index];
-
         // Initialize Bresenham line and distance counters
         st.counter_x = st.counter_y = st.counter_z = (st.exec_block->step_event_count >> 1);
       }
@@ -700,6 +720,22 @@ void st_prep_buffer()
         // segment buffer finishes the prepped block, but the stepper ISR is still executing it.
         st_prep_block = &st_block_buffer[prep.st_block_index];
         st_prep_block->direction_bits = pl_block->direction_bits;
+
+        #ifdef ENABLE_RGB_LED
+          if (pl_block->update_rgb == 1) {
+            // printPgmString(PSTR("get RGB from pl_block\n")); // JAVL            
+            prep.update_rgb = pl_block->update_rgb;
+            memcpy(prep.rgb, pl_block->rgb, 3*sizeof(uint8_t));
+            // printPgmString(PSTR("st_prep_block ")); // JAVL
+            // print_uint8_base10(st_prep_block->rgb[0]); 
+            // printPgmString(PSTR(",")); // JAVL
+            // print_uint8_base10(st_prep_block->rgb[1]); 
+            // printPgmString(PSTR(",")); // JAVL
+            // print_uint8_base10(st_prep_block->rgb[2]); 
+            // printPgmString(PSTR("\n")); // JAVL            
+          }
+        #endif
+
         #ifdef ENABLE_DUAL_AXIS
           #if (DUAL_AXIS_SELECT == X_AXIS)
             if (st_prep_block->direction_bits & (1<<X_DIRECTION_BIT)) { 
@@ -851,6 +887,13 @@ void st_prep_buffer()
 
     // Set new segment to point to the current segment data block.
     prep_segment->st_block_index = prep.st_block_index;
+    #ifdef ENABLE_RGB_LED
+      if(prep.update_rgb == 1) {
+        prep.update_rgb = 0;        
+        prep_segment->update_rgb = 1;
+        memcpy(prep_segment->rgb, prep.rgb, 3*sizeof(uint8_t));
+      }
+    #endif
 
     /*------------------------------------------------------------------------------------
         Compute the average velocity of this new segment by determining the total distance

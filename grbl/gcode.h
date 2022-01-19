@@ -202,6 +202,8 @@ typedef struct {
   uint8_t spindle;         // {M3,M4,M5}
   uint8_t override;        // {M56}
   uint8_t set_rgb_led;     // {M150}
+  uint8_t update_rgb;      //
+  uint8_t rgb[3];          //
 } gc_modal_t;
 
 typedef struct {
@@ -234,6 +236,9 @@ typedef struct {
   float coord_offset[N_AXIS];    // Retains the G92 coordinate offset (work coordinates) relative to
                                  // machine zero in mm. Non-persistent. Cleared upon reset and boot.
   float tool_length_offset;      // Tracks tool length offset value when enabled.
+
+  uint8_t update_rgb;            // whether the RGB LED needs to be updated before next move
+  uint8_t rgb[3];                // RGB value to use for LED
 } parser_state_t;
 extern parser_state_t gc_state;
 
