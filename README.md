@@ -1,6 +1,10 @@
 ### NOTE on this fork: 
 
-This is a direct fork of the original Grbl, with one addition: it allows you to control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken it uses the `UWV` arguments for the `RGB` colors, e.g. `M150 U200 W100 V100` will set the color to a light red. Color values are in the range `0-255`.
+This is a direct fork of the original Grbl, with some minor, but possible dangerous changes: 
+1. The option to control a WS12xx LED had been added. This LED is controlled from the same pin as `SPINDLE_ENABLE`
+2. It has an option (which is enabled by default in `config.h`) to disable limit checking on the Z axis: `DISABLE_Z_LIMIT`
+
+About the LED: you can control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken it uses the `UWV` arguments for the `RGB` colors, e.g. `M150 U200 W100 V100` will set the color to a light red. Color values are in the range `0-255`.
 
 The LED can be turned off again by setting all colors to zero: `M150 U0 W0 V0`. There is also a `ENABLE_RGB_FLAG` in `config.h` that should disable this function completely (but in that case you might be better of just using  vanilla Grbl).
 
