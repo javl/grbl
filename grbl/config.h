@@ -172,6 +172,9 @@
 // For example: `M150 200 100 100` for a light red color
 #define ENABLE_RGB_LED
 
+// Disable limit check for Z axis. DANGEROUS on machines that have a finite range of motion!
+#define DISABLE_Z_LIMIT
+
 // This option causes the feed hold input to act as a safety door switch. A safety door, when triggered,
 // immediately forces a feed hold and then safely de-energizes the machine. Resuming is blocked until
 // the safety door is re-engaged. When it is, Grbl will re-energize the machine and then resume on the
