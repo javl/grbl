@@ -29,13 +29,13 @@ void rgb_led_init(void)
 
 void rgb_led_set(uint16_t idx, uint8_t r, uint8_t g, uint8_t b) 
 {
-  printPgmString(PSTR("Set RGB to "));
-  print_uint8_base10(r); 
-  printPgmString(PSTR(", "));
-  print_uint8_base10(g); 
-  printPgmString(PSTR(", "));
-  print_uint8_base10(b); 
-  printPgmString(PSTR("\n"));
+  // printPgmString(PSTR("Set RGB to "));
+  // print_uint8_base10(r); 
+  // printPgmString(PSTR(", "));
+  // print_uint8_base10(g); 
+  // printPgmString(PSTR(", "));
+  // print_uint8_base10(b); 
+  // printPgmString(PSTR("\n"));
 
   if(idx < RGB_LED_NUM_RGB) {
     uint8_t *p = &rgb_led_rgb_arr[idx*3];

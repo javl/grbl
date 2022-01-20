@@ -382,13 +382,13 @@ ISR(TIMER1_COMPA_vect)
       #ifdef ENABLE_RGB_LED
         if (st.exec_segment->update_rgb == RGB_COMMAND_SET) {
           st.exec_segment->update_rgb = 0;
-          printPgmString(PSTR("Send to rgb_led_set: "));
-          print_uint8_base10(st.exec_segment->rgb[0]); 
-          printPgmString(PSTR(", "));
-          print_uint8_base10(st.exec_segment->rgb[1]); 
-          printPgmString(PSTR(", "));
-          print_uint8_base10(st.exec_segment->rgb[2]); 
-          printPgmString(PSTR("\n"));
+          // printPgmString(PSTR("Send to rgb_led_set: "));
+          // print_uint8_base10(st.exec_segment->rgb[0]); 
+          // printPgmString(PSTR(", "));
+          // print_uint8_base10(st.exec_segment->rgb[1]); 
+          // printPgmString(PSTR(", "));
+          // print_uint8_base10(st.exec_segment->rgb[2]); 
+          // printPgmString(PSTR("\n"));
 
           rgb_led_set(0, st.exec_segment->rgb[0], st.exec_segment->rgb[1], st.exec_segment->rgb[2]);
         }
