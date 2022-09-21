@@ -1,14 +1,19 @@
 ### NOTE on this fork: 
 
-This is a direct fork of the original Grbl, with some minor, but possible dangerous changes: 
+This is a direct fork of the original Grbl, with some minor, but **possibly dangerous changes**: 
 1. The option to control a WS12xx LED had been added. This LED is controlled from the same pin as `SPINDLE_ENABLE`
-2. It has an option (which is enabled by default in `config.h`) to disable limit checking on the Z axis: `DISABLE_Z_LIMIT`
+2. It has an option (which is enabled by default in `config.h`) to disable limit checking on the Z axis during movements (but not during homing): `DISABLE_Z_LIMIT`.
 
-About the LED: you can control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken it uses the `UWV` arguments for the `RGB` colors, e.g. `M150 U200 W100 V100` will set the color to a light red. Color values are in the range `0-255`.
+**Warning!** These functions were added to be used on a specific machine I built and **have not been tested** on a 'regular' CNC machine and probably will not work, leading to dangerous situations. Please be careful when trying to use this code on your machine as it might behave in unexpected ways!
 
-The LED can be turned off again by setting all colors to zero: `M150 U0 W0 V0`. There is also a `ENABLE_RGB_FLAG` in `config.h` that should disable this function completely (but in that case you might be better of just using  vanilla Grbl).
+### About the LED: 
+You can control a WS28xx LED on (Arduino) digital pin 13 using the `M150` command. As the `G` argument is already taken by GRBL it uses the `UWV` arguments for the `RGB` colors, e.g. `M150 U200 W100 V100` will set the color to a light red. Color values are in the range `0-255`.
 
-**Warning!** This function was added to be used on a specific machine I built and **has not been tested** on a 'regular' CNC machine. The pin used for the LED is one that possibly overlaps the pin for `Spindle Enable` (depending on your settings), which I didn't need. Please be careful when trying to use this code on your machine as it might behave in unexpected ways!
+The LED can be turned off again by setting all colors to zero: `M150 U0 W0 V0`. There is also a `ENABLE_RGB_FLAG` in `config.h` that _should_ disable this function completely (but in that case you might be better of just using  vanilla Grbl).
+
+### About the disabled Z limit:
+With `DISABLE_Z_LIMIT` enabled GRBL wil NOT check for Z limits during movements, but it will still search for the Z home positon during homing. I use this with a rotary Z axis which can move endlessly in both directions, but still has a switch which can be used to find a specific starting orientation on this axis.
+
 
 ***
 
